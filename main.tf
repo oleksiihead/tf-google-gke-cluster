@@ -1,9 +1,3 @@
-provider "google" {
-  # Configuration options
-  project = var.GOOGLE_PROJECT
-  region  = var.GOOGLE_REGION
-}
-
 resource "google_container_cluster" "this" {
   name     = var.GKE_CLUSTER_NAME
   location = var.GOOGLE_REGION
@@ -44,9 +38,15 @@ module "gke_auth" {
   location             = var.GOOGLE_REGION
 }
 
-resource "local_file" "kubeconfig" {
-  content  = module.gke_auth.kubeconfig_raw
-  filename = "${path.module}/kubeconfig"
-  file_permission = "0400"
-}
+# resource "local_file" "kubeconfig" {
+#   content  = module.gke_auth.kubeconfig_raw
+#   filename = "${path.module}/kubeconfig"
+#   file_permission = "0400"
+# }
 
+data "google_client_config" "current" {}
+
+data "google_container_cluster" "main" {
+  name     = google_container_cluster.this.name
+  location = var.GOOGLE_REGION
+}
